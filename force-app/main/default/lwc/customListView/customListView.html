@@ -1,0 +1,250 @@
+<template>
+  <lightning-card>
+    <!-- Title slot -->
+    <h3 slot="title" class="slds-media slds-media_center slds-has-flexi-truncate">
+      <span class="slds-media__figure">
+        <lightning-icon icon-name={displayIcon} alternative-text={displayTitle} size="small"></lightning-icon>
+      </span>
+      <span class="slds-media__body">
+        <span class="slds-text-heading_small slds-truncate">{displayTitle}</span>
+      </span>
+    </h3>
+
+    <!-- Actions slot (top-right) -->
+    <div slot="actions" class="slds-grid slds-grid_align-end slds-wrap header-controls">
+      <!-- Search -->
+      <template if:true={showSearch}>
+        <div class="slds-form-element slds-m-right_small slds-m-bottom_x-small">
+          <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+            <lightning-icon icon-name="utility:search"
+              class="slds-input__icon slds-input__icon_left slds-icon-text-default" size="x-small"></lightning-icon>
+            <lightning-input type="search" class="search-input" value={searchTerm} placeholder="Search records..."
+              onchange={handleSearch} oninput={handleSearch} variant="label-hidden"
+              aria-label="Search records"></lightning-input>
+          </div>
+        </div>
+      </template>
+
+      <!-- Filters button -->
+      <div class="slds-form-element slds-m-right_small slds-m-bottom_x-small">
+        <lightning-button-icon icon-name="utility:filterList" alternative-text="Filters" onclick={toggleFilterPanel}
+          variant="border-filled" size="medium" title="Filters" disabled={filtersDisabled}></lightning-button-icon>
+      </div>
+
+      <!-- Refresh button -->
+      <div class="slds-m-bottom_x-small">
+        <lightning-button-icon icon-name="utility:refresh" alternative-text="Refresh" onclick={handleRefresh}
+          variant="border-filled" size="medium"></lightning-button-icon>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="slds-p-horizontal_small slds-p-vertical_small">
+      <!-- Filter Panel (popover) -->
+      <template if:true={showFilterPanel}>
+        <section class="slds-popover slds-nubbin_top-right custom-filter-panel" role="dialog" aria-label="Filters">
+          <header class="slds-popover__header">
+            <h2 class="slds-text-heading_small">Filters</h2>
+          </header>
+          <div class="slds-popover__body">
+            <template for:each={filterFieldList} for:item="ff">
+              <div key={ff.apiName} class="slds-m-bottom_small">
+                <label class="slds-form-element__label">{ff.label}</label>
+
+                <!-- Picklist / Multi-picklist -->
+                <template if:true={ff.kindIsPicklist}>
+                  <lightning-dual-listbox name={ff.apiName} source-label="Available" selected-label="Selected"
+                    options={ff.options} value={ff.selectedValues} onchange={handleFilterChange}
+                    min="0"></lightning-dual-listbox>
+                </template>
+
+                <!-- Date -->
+                <template if:true={ff.kindIsDate}>
+                  <div class="slds-grid slds-wrap slds-gutters_small">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                      <lightning-combobox data-api={ff.apiName} label="Mode" value={ff.state.mode}
+                        options={dateModeOptions} onchange={handleDateFilterModeChange}></lightning-combobox>
+                    </div>
+
+                    <template if:true={ff.state.modeIsOn}>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                        <lightning-input type="date" name="date" data-api={ff.apiName} value={ff.state.date}
+                          onchange={handleDateFilterChange} label="Date"></lightning-input>
+                      </div>
+                    </template>
+
+                    <template if:true={ff.state.modeIsBetween}>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-input type="date" name="start" data-api={ff.apiName} value={ff.state.start}
+                          onchange={handleDateFilterChange} label="Start date"></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-input type="date" name="end" data-api={ff.apiName} value={ff.state.end}
+                          onchange={handleDateFilterChange} label="End date"></lightning-input>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+
+                <!-- DateTime -->
+                <template if:true={ff.kindIsDateTime}>
+                  <div class="slds-grid slds-wrap slds-gutters_small">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                      <lightning-combobox data-api={ff.apiName} label="Mode" value={ff.state.mode}
+                        options={dateTimeModeOptions} onchange={handleDateFilterModeChange}></lightning-combobox>
+                    </div>
+
+                    <template if:true={ff.state.modeIsOn}>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                        <lightning-input type="date" name="date" data-api={ff.apiName} value={ff.state.date}
+                          onchange={handleDateFilterChange} label="Date"></lightning-input>
+                        <p class="slds-text-color_weak slds-text-body_small slds-m-top_x-small">
+                          Matches records where the date-time falls within that
+                          local day.
+                        </p>
+                      </div>
+                    </template>
+
+                    <template if:true={ff.state.modeIsBetween}>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-input type="datetime-local" name="dateTimeStart" data-api={ff.apiName}
+                          value={ff.state.dateTimeStart} onchange={handleDateFilterChange}
+                          label="Start"></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-input type="datetime-local" name="dateTimeEnd" data-api={ff.apiName}
+                          value={ff.state.dateTimeEnd} onchange={handleDateFilterChange} label="End"></lightning-input>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <template if:false={hasFilterableFields}>
+              <div class="slds-text-color_weak slds-text-body_small">
+                No filterable fields configured or fields are not
+                picklists/dates.
+              </div>
+            </template>
+          </div>
+          <footer class="slds-popover__footer slds-grid slds-grid_align-spread">
+            <lightning-button label="Clear All" variant="neutral" onclick={clearAllFilters}></lightning-button>
+            <div>
+              <lightning-button class="slds-m-right_x-small" label="Cancel" variant="neutral"
+                onclick={toggleFilterPanel}></lightning-button>
+              <lightning-button label="Apply" variant="brand" onclick={applyFilters}
+                disabled={applyDisabled}></lightning-button>
+            </div>
+          </footer>
+        </section>
+      </template>
+
+      <!-- Loading -->
+      <template if:true={isLoading}>
+        <div class="loading-container slds-m-vertical_medium">
+          <lightning-spinner alternative-text="Loading records..." size="medium" variant="brand"></lightning-spinner>
+          <div class="slds-m-top_small slds-text-align_center">
+            <span class="slds-text-body_small slds-text-color_weak">Loading records...</span>
+          </div>
+        </div>
+      </template>
+
+      <!-- Error -->
+      <template if:true={error}>
+        <div class="slds-notify slds-notify_alert slds-theme_error slds-m-around_medium">
+          <span class="slds-assistive-text">Error</span>
+          <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_small"></lightning-icon>
+          <h2 class="slds-text-heading_small">{error}</h2>
+        </div>
+      </template>
+
+      <!-- Records -->
+      <template if:true={hasRecords}>
+        <div class="datatable-wrapper">
+          <lightning-datatable key-field={datatableProps.keyField} data={datatableProps.data}
+            columns={datatableProps.columns} hide-checkbox-column={datatableProps.hideCheckboxColumn}
+            show-row-number-column={datatableProps.showRowNumberColumn}
+            resize-column-disabled={datatableProps.resizeColumnDisabled}
+            wrap-text-max-lines={datatableProps.wrapTextMaxLines} onrowaction={handleRowAction} onsort={handleSort}
+            sorted-by={sortedBy} sorted-direction={sortedDirection}></lightning-datatable>
+        </div>
+      </template>
+
+      <!-- Empty state -->
+      <template if:false={hasRecords}>
+        <template if:false={isLoading}>
+          <div class="no-records slds-m-vertical_medium">
+            <div class="slds-text-color_weak slds-text-align_center">
+              <lightning-icon icon-name="utility:info" size="small" class="slds-m-bottom_small"></lightning-icon>
+              <div>
+                <p class="slds-text-heading_small">No records found</p>
+                <template if:true={searchTerm}>
+                  <p class="slds-text-body_small slds-m-top_x-small">
+                    Try adjusting your search or filters
+                  </p>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+      </template>
+    </div>
+
+    <!-- Footer slot (pagination) -->
+    <template if:true={showPagination}>
+      <div slot="footer" class="clv-footer slds-p-around_small">
+        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-wrap">
+          <!-- Left: record range -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-order_2 slds-medium-order_1">
+            <p class="slds-text-body_small slds-text-color_weak slds-truncate" title={paginationInfo}>
+              {paginationInfo}
+            </p>
+          </div>
+
+          <!-- Center: pagination controls -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-order_1 slds-medium-order_2">
+            <div class="clv-pagination slds-align_absolute-center">
+              <div class="slds-button-group" role="group" aria-label="Pagination">
+                <lightning-button-icon icon-name="utility:jump_to_left" alternative-text="First page" title="First page"
+                  onclick={handleFirstPage} disabled={isPreviousDisabled} variant="border" size="small"
+                  class="clv-icon-btn"></lightning-button-icon>
+
+                <lightning-button-icon icon-name="utility:chevronleft" alternative-text="Previous page"
+                  title="Previous page" onclick={handlePrevious} disabled={isPreviousDisabled} variant="border"
+                  size="small" class="clv-icon-btn"></lightning-button-icon>
+
+                <div class="clv-page-field slds-m-horizontal_x-small">
+                  <lightning-input type="number" id="pageNumber" min="1" max={totalPages} value={currentPage}
+                    onchange={handlePageChange} variant="label-hidden" aria-label="Page number"></lightning-input>
+                </div>
+
+                <lightning-button-icon icon-name="utility:chevronright" alternative-text="Next page" title="Next page"
+                  onclick={handleNext} disabled={isNextDisabled} variant="border" size="small"
+                  class="clv-icon-btn"></lightning-button-icon>
+
+                <lightning-button-icon icon-name="utility:jump_to_right" alternative-text="Last page" title="Last page"
+                  onclick={handleLastPage} disabled={isNextDisabled} variant="border" size="small"
+                  class="clv-icon-btn"></lightning-button-icon>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: page size selector -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-text-align_right slds-order_3">
+            <template if:true={showPageSize}>
+              <div class="slds-grid slds-grid_align-end slds-grid_vertical-align-center">
+                <label class="slds-form-element__label slds-m-right_x-small slds-text-color_weak slds-text-body_small"
+                  for="pageSize">
+                  Rows per page
+                </label>
+                <lightning-combobox id="pageSize" style="width: 100%" class="clv-page-size" value={recordsPerPage}
+                  options={pageSizeOptions} onchange={handlePageSizeChange} variant="label-hidden"></lightning-combobox>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
+  </lightning-card>
+</template>

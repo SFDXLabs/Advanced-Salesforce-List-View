@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>64.0</apiVersion>
+  <isExposed>true</isExposed>
+
+  <masterLabel>Custom List View</masterLabel>
+  <description>
+    A dynamic list view with evenly distributed columns and auto height that
+    grows/shrinks to fit the number of rows.
+  </description>
+
+  <targets>
+    <target>lightning__RecordPage</target>
+    <target>lightning__AppPage</target>
+    <target>lightning__HomePage</target>
+  </targets>
+
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage,lightning__AppPage,lightning__HomePage">
+      <property
+        name="objectApiName"
+        type="String"
+        label="SObject API Name"
+        default="Account"
+        description="API name of the object to query (e.g., Account, Contact, custom__c)."
+      />
+      <property
+        name="componentTitle"
+        type="String"
+        label="Title"
+        description="Optional title shown in the card header."
+      />
+      <property
+        name="iconName"
+        type="String"
+        label="Header Icon (e.g., standard:list_view)"
+        default="standard:list_view"
+      />
+      <property
+        name="backgroundColor"
+        type="String"
+        label="Background Color (HEX)"
+        default="#FFFFFF"
+      />
+      <property
+        name="fieldsToDisplay"
+        type="String"
+        label="Fields to Display (comma-separated API names)"
+        description="Example: Name,Type,Industry"
+        default="Name,Type,Industry"
+      />
+      <property
+        name="whereClause"
+        type="String"
+        label="WHERE Clause (SOQL fragment without WHERE)"
+        description="Optional filter, e.g., Industry = 'Banking'"
+      />
+      <property
+        name="recordsPerPage"
+        type="Integer"
+        label="Records Per Page"
+        min="1"
+        max="200"
+        default="25"
+      />
+      <property name="showSearch" type="Boolean" label="Show Search" default="false" />
+      <property name="showRowNumbers" type="Boolean" label="Show Row Numbers" default="false" />
+      <property
+        name="sortableFields"
+        type="String"
+        label="Sortable Fields (subset of Fields to Display)"
+        description="Comma-separated API names that should be sortable (e.g., Name,Industry)"
+      />
+      <property
+        name="filterFields"
+        type="String"
+        label="Filter Fields (Picklist/Multi-Picklist, subset of Fields to Display)"
+        description="Comma-separated API names to expose as filters (e.g., Industry,Type,BaseModel__c)"
+      />
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>
