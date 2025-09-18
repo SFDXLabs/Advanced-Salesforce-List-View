@@ -1,12 +1,32 @@
 # Advanced-Salesforce-List-View
-The standard Salesforce List View component is good, but it is not brilliant. We can view records, add global filters and search for text but that is pretty much it. This project was designed to take this list view and improve on it.
+Tired of the limitations in standard list views? Advanced Salesforce List View is an open-source Lightning Web Component that brings powerful filtering (including Date/DateTime), smooth server-side pagination, flexible sorting, and a polished, responsive UI. Drop it on any Record, Home, or App page and configure it in minutes.
 
 ### Current Features
-- Enhanced search (search all fields including formulas, picklists, etc... not just pure text)
-- Improved filters to allow users to filter on what they want to see there and then
-- Pagination and lazy-loading to reduce initial loading times
-- Configurable properties making this re-usable in all types of situations
-- Conforms to SLDS so looks OOTB on both SLDS v1.0 & v2.0
+- Server-side pagination with total count and range display
+- Client-side debounced searching across selected fields
+- Selective sorting on a per-field whitelist
+- Dynamic filter panel
+	- Picklist and Multi-Picklist filters (record type aware)
+	- Date filters: On or Between
+	- DateTime filters: On (calendar day/local) or Between
+	- Apply, Cancel, and Clear All with validation
+- Uniform, accessible pagination controls and page-size selector
+- Evenly distributed columns with wrapping and alignment by data type
+- Error handling with sticky toasts and clear empty/loading states
+- Optional row numbers
+- Refresh button and public API to refresh/clear search
+- Works on lightning__RecordPage, lightning__HomePage, and lightning__AppPage
+
+### Features to be added in future releases:
+- Inline actions menu (View/Edit/Delete) with standard navigation
+- Column renderers for references (record links) and richer types
+- CSV export that respects current filters and sort
+- Saved filter presets per user
+- Virtualized rows for very large pages
+- Column-level configuration via metadata for admins (no code)
+- Inline editing where supported by lightning-datatable
+- Better currency/locale controls
+- Enforce user access control
 
 ## Basic view of how the List View looks
 <img width="2416" height="1140" alt="Screenshot 2025-09-18 at 09-10-49 2025 Aston Martin DB12 Goldfinger Model Salesforce" src="https://github.com/user-attachments/assets/a33885b3-48fb-441d-983c-28c1628c5083" />
@@ -16,3 +36,12 @@ The standard Salesforce List View component is good, but it is not brilliant. We
 
 ## Configuration options inside the Lightning Page Editor
 <img width="594" height="1743" alt="Screenshot 2025-09-18 at 09-11-17 Model Record Page - Lightning App Builder" src="https://github.com/user-attachments/assets/9d5f4f92-3b2e-4521-99c2-85703978ea24" />
+
+## Contributing:
+We welcome issues and PRs! Please:
+- Describe bugs with repro steps and org context
+- Keep PRs focused; include before/after notes or screenshots
+- Follow SLDS and LWC best practices and include tests where possible
+
+### License:
+MIT. See LICENSE for details.
